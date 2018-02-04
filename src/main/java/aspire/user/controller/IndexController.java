@@ -10,4 +10,9 @@ public class IndexController {
     public String index() {
         return "Welcome to Aspire User Service";
     }
+
+    @RequestMapping("/authenticated")
+    public String authenticated() {
+        return "User authenticated!";
+    }
 }
