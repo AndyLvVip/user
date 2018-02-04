@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+    <appender name="DEBUG_LOG_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+        </encoder>
+        <file>logs/aspire-user.log</file>
+        <rollingPolicy class="aspire.user.log.MySizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/aspire-user.%d{yyyyMMdd_HHmmss}.%i.log</fileNamePattern>
+            <MaxFileSize>5MB</MaxFileSize>
+        </rollingPolicy>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="DEBUG_LOG_FILE"/>
+    </root>
+    <logger name="aspire" level="DEBUG">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="DEBUG_LOG_FILE"/>
+    </logger>
+</configuration>
