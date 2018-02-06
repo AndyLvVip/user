@@ -3,9 +3,9 @@
     <!-- Configure the database connection here -->
     <jdbc>
         <driver>com.mysql.jdbc.Driver</driver>
-        <url>jdbc:mysql://localhost:3306/aspire_user?useUnicode=true&amp;characterEncoding=utf-8</url>
-        <user>root</user>
-        <password>lvhuosheng</password>
+        <url>jdbc:mysql://ec2-18-219-74-117.us-east-2.compute.amazonaws.com:3306/aspire_user?useUnicode=true&amp;characterEncoding=utf-8</url>
+        <user>andy</user>
+        <password>andy</password>
         <!-- You can also pass user/password and other JDBC properties in the optional properties tag: -->
         <!--
         <properties>

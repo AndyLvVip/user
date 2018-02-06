@@ -26,8 +26,7 @@ public class TestUser {
     public void insert() {
         UserModel user = new UserModel();
         user.setEmail("abc@efg.com");
-        user.setFamilyName("姓");
-        user.setGivenName("名字");
+        user.setNickname("紫陌红尘");
         user.setPhone("13800138000");
         user.setUsername("andy");
         user.setPassword(DigestUtils.md5Hex("123456"));

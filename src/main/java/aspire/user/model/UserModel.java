@@ -19,9 +19,15 @@ public class UserModel extends BaseModel {
 
     private String phone;
 
-    private String familyName;
+    public String getNickname() {
+        return nickname;
+    }
 
-    private String givenName;
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    private String nickname;
 
     private String email;
 
@@ -49,22 +55,6 @@ public class UserModel extends BaseModel {
 
     public void setPhone(String phone) {
         this.phone = phone;
-    }
-
-    public String getFamilyName() {
-        return familyName;
-    }
-
-    public void setFamilyName(String familyName) {
-        this.familyName = familyName;
-    }
-
-    public String getGivenName() {
-        return givenName;
-    }
-
-    public void setGivenName(String givenName) {
-        this.givenName = givenName;
     }
 
     public String getEmail() {

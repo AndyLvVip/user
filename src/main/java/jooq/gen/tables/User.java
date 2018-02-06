@@ -41,7 +41,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class User extends TableImpl<UserRecord> {
 
-    private static final long serialVersionUID = -378166242;
+    private static final long serialVersionUID = 1111027593;
 
     /**
      * The reference instance of <code>user</code>
@@ -77,24 +77,9 @@ public class User extends TableImpl<UserRecord> {
     public final TableField<UserRecord, String> PHONE = createField("phone", org.jooq.impl.SQLDataType.CHAR(11).nullable(false), this, "");
 
     /**
-     * The column <code>user.familyName</code>.
+     * The column <code>user.nickname</code>.
      */
-    public final TableField<UserRecord, String> FAMILYNAME = createField("familyName", org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
-
-    /**
-     * The column <code>user.givenName</code>.
-     */
-    public final TableField<UserRecord, String> GIVENNAME = createField("givenName", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "");
-
-    /**
-     * The column <code>user.createdOn</code>.
-     */
-    public final TableField<UserRecord, LocalDateTime> CREATEDON = createField("createdOn", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "", new JooqDateConverter());
-
-    /**
-     * The column <code>user.createdBy</code>.
-     */
-    public final TableField<UserRecord, String> CREATEDBY = createField("createdBy", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "");
+    public final TableField<UserRecord, String> NICKNAME = createField("nickname", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "");
 
     /**
      * The column <code>user.email</code>.
@@ -105,6 +90,16 @@ public class User extends TableImpl<UserRecord> {
      * The column <code>user.isObsolete</code>.
      */
     public final TableField<UserRecord, Boolean> ISOBSOLETE = createField("isObsolete", org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>user.createdOn</code>.
+     */
+    public final TableField<UserRecord, LocalDateTime> CREATEDON = createField("createdOn", org.jooq.impl.SQLDataType.TIMESTAMP.nullable(false), this, "", new JooqDateConverter());
+
+    /**
+     * The column <code>user.createdBy</code>.
+     */
+    public final TableField<UserRecord, String> CREATEDBY = createField("createdBy", org.jooq.impl.SQLDataType.VARCHAR(50).nullable(false), this, "");
 
     /**
      * The column <code>user.updatedOn</code>.
