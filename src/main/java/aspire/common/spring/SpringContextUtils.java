@@ -33,7 +33,7 @@ public class SpringContextUtils {
 
     @Autowired
     public void setApplicationContext(ApplicationContext applicationContext){
-        SpringContextUtils.applicationContext = applicationContext;
         LOG.debug(INIT_AS_SINGLETON_LABEL + this.getClass().getSimpleName());
+        SpringContextUtils.applicationContext = applicationContext;
     }
 }

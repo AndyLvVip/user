@@ -27,7 +27,7 @@ public class BaseRepository {
     }
 
     private static class DSLContextHolder {
-        private static final DSLContext INSTANCE = instance();
+        private static final DSLContext DSL_CONTEXT = instance();
 
         private static DSLContext instance() {
             return SpringContextUtils.getBean("dsl", DSLContext.class);
@@ -35,7 +35,7 @@ public class BaseRepository {
     }
 
     protected static DSLContext dsl() {
-        return DSLContextHolder.INSTANCE;
+        return DSLContextHolder.DSL_CONTEXT;
     }
 
     /**
