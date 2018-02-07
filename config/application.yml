@@ -9,6 +9,6 @@ server:
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_URI:http://localhost:8761/eureka}
+      defaultZone: ${EUREKA_URI:http://ec2-13-59-206-194.us-east-2.compute.amazonaws.com/eureka}
     instance:
       preferIpAddress: true
