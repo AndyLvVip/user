@@ -1,6 +1,7 @@
 package aspire.user.model;
 
 import aspire.common.model.BaseModel;
+import aspire.user.UserRepository;
 import org.jooq.Table;
 import org.jooq.UpdatableRecord;
 
@@ -86,5 +87,9 @@ public class UserModel extends BaseModel {
     public void insert(String createdBy) {
         setIsObsolete(false);
         super.insert(createdBy);
+    }
+
+    public static UserModel fetchEntryByUserName(String username) {
+        return UserRepository.INSTANCE.fetchEntryByUserName(username);
     }
 }
