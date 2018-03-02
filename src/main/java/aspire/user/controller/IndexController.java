@@ -1,5 +1,6 @@
 package aspire.user.controller;
 
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,6 +13,7 @@ public class IndexController {
     }
 
     @RequestMapping("/authenticated")
+    @Secured("149_23")
     public String authenticated() {
         return "User authenticated!";
     }
