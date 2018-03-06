@@ -1,5 +1,6 @@
 package aspire.common.security;
 
+import aspire.user.controller.exception.ExceptionAdviceController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Author: andy.lv
@@ -26,22 +28,32 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodSecurityConfig.class);
 
+
+    private final AtomicInteger counter = new AtomicInteger(0);
+
     @Override
     protected AccessDecisionManager accessDecisionManager() {
         return new AccessDecisionManager() {
             @Override
             public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
-                if(CollectionUtils.isEmpty(authentication.getAuthorities()) || (authentication.getAuthorities().toArray(new SummaryGrantedAuthority[0])[0]).getAuthorityList().size() != 24
-                        || CollectionUtils.isEmpty(collection) || collection.size() < 1)
-                    throw new InsufficientAuthenticationException(authentication.getName() + " is insufficient authentication");
 
-                String requiredAuthority = collection.iterator().next().getAttribute();
-                String menuId = requiredAuthority.split("_")[0];
-                String rightCode = requiredAuthority.split("_")[1];
-                SummaryGrantedAuthority authorityObj = (SummaryGrantedAuthority) authentication.getAuthorities().iterator().next();
-                BigInteger authority = new BigInteger(authorityObj.getAuthorityList().get(Integer.parseInt(rightCode)));
-                if(!authority.testBit(Integer.parseInt(menuId)))
-                    throw new AccessDeniedException(authentication.getName() + " is denied for the access");
+                if(counter.getAndIncrement() % 2 == 0) {
+                    throw new ExceptionAdviceController.NotEnoughAccessRight("权限不够");
+                }else {
+                    throw new ExceptionAdviceController.NotLoginException("未登录");
+                }
+
+//                if(CollectionUtils.isEmpty(authentication.getAuthorities()) || (authentication.getAuthorities().toArray(new SummaryGrantedAuthority[0])[0]).getAuthorityList().size() != 24
+//                        || CollectionUtils.isEmpty(collection) || collection.size() < 1)
+//                    throw new InsufficientAuthenticationException(authentication.getName() + " is insufficient authentication");
+//
+//                String requiredAuthority = collection.iterator().next().getAttribute();
+//                String menuId = requiredAuthority.split("_")[0];
+//                String rightCode = requiredAuthority.split("_")[1];
+//                SummaryGrantedAuthority authorityObj = (SummaryGrantedAuthority) authentication.getAuthorities().iterator().next();
+//                BigInteger authority = new BigInteger(authorityObj.getAuthorityList().get(Integer.parseInt(rightCode)));
+//                if(!authority.testBit(Integer.parseInt(menuId)))
+//                    throw new AccessDeniedException(authentication.getName() + " is denied for the access");
             }
 
             @Override

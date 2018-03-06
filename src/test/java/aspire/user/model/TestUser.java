@@ -19,7 +19,6 @@ import java.util.concurrent.*;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
-@DependsOn(SpringContextUtils.BEAN_NAME)
 public class TestUser {
 
     @Test

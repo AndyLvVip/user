@@ -8,6 +8,9 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Table;
 import org.jooq.UpdatableRecord;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,24 +21,14 @@ import java.util.List;
  * @Date: created on 2018/2/5
  * @Description:
  */
+@Repository
+@Primary
 public class BaseRepository {
 
-    public static final BaseRepository INSTANCE = new BaseRepository();
+    @Autowired private DSLContext dslCtx;
 
-    protected BaseRepository() {
-
-    }
-
-    private static class DSLContextHolder {
-        private static final DSLContext DSL_CONTEXT = instance();
-
-        private static DSLContext instance() {
-            return SpringContextUtils.getBean("dsl", DSLContext.class);
-        }
-    }
-
-    protected static DSLContext dsl() {
-        return DSLContextHolder.DSL_CONTEXT;
+    protected DSLContext dsl() {
+        return dslCtx;
     }
 
     /**

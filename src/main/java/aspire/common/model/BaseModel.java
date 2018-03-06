@@ -2,6 +2,7 @@ package aspire.common.model;
 
 import aspire.common.repository.BaseRepository;
 import aspire.common.utils.MyStringUtils;
+import aspire.user.repository.factory.Repositories;
 import org.apache.commons.lang.StringUtils;
 import org.jooq.Table;
 import org.jooq.UpdatableRecord;
@@ -80,7 +81,7 @@ public abstract class BaseModel implements Serializable {
     public abstract <R extends UpdatableRecord> Table<R> table();
 
     public void batchInsert(List<? extends BaseModel> models) {
-        BaseRepository.INSTANCE.batchInsert(models);
+        Repositories.baseRepository().batchInsert(models);
     }
 
     public void insert(String createdBy) {
@@ -97,7 +98,7 @@ public abstract class BaseModel implements Serializable {
         if(null == getUpdatedOn())
             setUpdatedOn(LocalDateTime.now());
         setVersion(0);
-        BaseRepository.INSTANCE.insert(this);
+        Repositories.baseRepository().insert(this);
     }
 
     public void update(String updatedBy) {
@@ -106,15 +107,15 @@ public abstract class BaseModel implements Serializable {
     }
     public void update() {
         setUpdatedOn(LocalDateTime.now());
-        BaseRepository.INSTANCE.update(this);
+        Repositories.baseRepository().update(this);
     }
 
     public void delete() {
-        BaseRepository.INSTANCE.delete(this);
+        Repositories.baseRepository().delete(this);
     }
 
     public static <T extends BaseModel> T fetchEntry(Class<T> returnType, String id) {
-        return BaseRepository.INSTANCE.fetchEntry(returnType, id);
+        return Repositories.baseRepository().fetchEntry(returnType, id);
     }
 
 }
