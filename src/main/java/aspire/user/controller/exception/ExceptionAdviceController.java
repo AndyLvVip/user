@@ -1,5 +1,8 @@
 package aspire.user.controller.exception;
 
+import aspire.common.interceptor.response.AspireResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,59 +16,20 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @ControllerAdvice
 public class ExceptionAdviceController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionAdviceController.class);
 
-    public static class NotLoginException extends AccessDeniedException {
-        public NotLoginException(String msg) {
-            super(msg);
-        }
-    }
-
-    public static class NotEnoughAccessRight extends AccessDeniedException {
-
-        public NotEnoughAccessRight(String msg) {
-            super(msg);
-        }
-    }
-
-    public static class AuthenticatedResponse {
-
-        private static final AuthenticatedResponse NOT_LOGIN = new AuthenticatedResponse("101", "没有登录"),
-        NOT_ENOUGH_ACCESS_RIGHT = new AuthenticatedResponse("102", "权限不足")
-        ;
-
-        private String message;
-        private String code;
-        private AuthenticatedResponse (String code, String msg) {
-            this.code = code;
-            this.message = msg;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
-        public String getCode() {
-            return code;
-        }
-
-        public void setCode(String code) {
-            this.code = code;
-        }
-    }
-
-    @ExceptionHandler(NotLoginException.class)
+    @ExceptionHandler(AccessDeniedException.class)
     @ResponseBody
-    public AuthenticatedResponse notLogin() {
-        return AuthenticatedResponse.NOT_LOGIN;
+    public AspireResponse accessDenied(AccessDeniedException ex) {
+        LOG.error(ex.getMessage(), ex);
+        return AspireResponse.ACCESS_DENIED;
     }
 
-    @ExceptionHandler(NotEnoughAccessRight.class)
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    public AuthenticatedResponse notEnoughAccessRight() {
-        return AuthenticatedResponse.NOT_ENOUGH_ACCESS_RIGHT;
+    public AspireResponse globalException(Exception ex) {
+        LOG.error(ex.getMessage(), ex);
+        return AspireResponse.ITERNAL_SERVER_ERROR;
     }
+
 }

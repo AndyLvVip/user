@@ -1,20 +1,22 @@
 package aspire.user.controller;
 
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class IndexController {
 
     @RequestMapping("/")
-    public String index() {
+    public Object index() {
         return "Welcome to Aspire User Service";
     }
 
     @RequestMapping("/authenticated")
     @Secured("149_23")
-    public String authenticated() {
+    public Object authenticated() {
         return "User authenticated!";
     }
 }

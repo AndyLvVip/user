@@ -7,10 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -28,19 +30,14 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(MethodSecurityConfig.class);
 
-
-    private final AtomicInteger counter = new AtomicInteger(0);
-
     @Override
     protected AccessDecisionManager accessDecisionManager() {
         return new AccessDecisionManager() {
             @Override
             public void decide(Authentication authentication, Object o, Collection<ConfigAttribute> collection) throws AccessDeniedException, InsufficientAuthenticationException {
 
-                if(counter.getAndIncrement() % 2 == 0) {
-                    throw new ExceptionAdviceController.NotEnoughAccessRight("权限不够");
-                }else {
-                    throw new ExceptionAdviceController.NotLoginException("未登录");
+                if(authentication instanceof AnonymousAuthenticationToken) {
+                    throw new AccessDeniedException("Access Denied");
                 }
 
 //                if(CollectionUtils.isEmpty(authentication.getAuthorities()) || (authentication.getAuthorities().toArray(new SummaryGrantedAuthority[0])[0]).getAuthorityList().size() != 24

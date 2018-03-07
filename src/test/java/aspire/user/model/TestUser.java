@@ -10,7 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @Author: andy.lv
@@ -58,5 +62,31 @@ public class TestUser {
         }
         service.shutdown();
         service.awaitTermination(10, TimeUnit.MINUTES);
+    }
+
+
+    public static String maskify(String str) {
+        if (str.length() > 4) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.length() - 4; i++)
+                sb.append("#");
+            sb.append(str.substring(str.length() - 4));
+
+            return sb.toString();
+        }
+        return str;
+    }
+
+
+    @Test
+    public void testSolution() {
+        assertEquals(maskify("4556364607935616"), "############5616");
+        assertEquals(maskify(     "64607935616"),      "#######5616");
+        assertEquals(maskify(               "1"),                "1");
+        assertEquals(maskify(                ""),                 "");
+
+        // "What was the name of your first pet?"
+        assertEquals(maskify("Skippy")                                  , "##ippy");
+        assertEquals(maskify("Nananananananananananananananana Batman!"), "####################################man!");
     }
 }
