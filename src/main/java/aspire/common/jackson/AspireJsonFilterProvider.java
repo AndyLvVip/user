@@ -18,9 +18,7 @@ import java.util.Set;
  */
 public class AspireJsonFilterProvider extends FilterProvider {
 
-    public static final AspireJsonFilterProvider INSTANCE = new AspireJsonFilterProvider();
-
-    private static final ThreadLocal<AspireResponse> ASPIRE_RESPONSE_THREAD_LOCAL = new ThreadLocal<>();
+    private AspireResponse aspireResponse;
 
     @Override
     public BeanPropertyFilter findFilter(Object filterId) {
@@ -36,9 +34,8 @@ public class AspireJsonFilterProvider extends FilterProvider {
             @Override
             public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
                 System.out.println("SimpleBeanPropertyFilter.serializeAsField: " + this);
-                if(pojo instanceof AspireResponse && !((AspireResponse) pojo).handled()) {
-                    ((AspireResponse) pojo).handled(true);
-                    ASPIRE_RESPONSE_THREAD_LOCAL.set((AspireResponse) pojo);
+                if(pojo instanceof AspireResponse && null == aspireResponse) {
+                    aspireResponse = (AspireResponse) pojo;
                 }
 
                 if (include(pojo, writer)) {
@@ -49,13 +46,15 @@ public class AspireJsonFilterProvider extends FilterProvider {
             }
 
             private boolean include(Object pojo, PropertyWriter writer) {
-                if(null != ASPIRE_RESPONSE_THREAD_LOCAL.get().includedFieldMaps()) {
-                    Set<String> includedFields = ASPIRE_RESPONSE_THREAD_LOCAL.get().includedFieldMaps().get(pojo.getClass());
+                if(aspireResponse == null)
+                    return true;
+                if(null != aspireResponse.includedFieldMaps()) {
+                    Set<String> includedFields = aspireResponse.includedFieldMaps().get(pojo.getClass());
                     if(null != includedFields)
                         return includedFields.contains(writer.getName());
                 }
-                if(null != ASPIRE_RESPONSE_THREAD_LOCAL.get().excludedFieldMaps()) {
-                    Set<String> excludedFields = ASPIRE_RESPONSE_THREAD_LOCAL.get().excludedFieldMaps().get(pojo.getClass());
+                if(null != aspireResponse.excludedFieldMaps()) {
+                    Set<String> excludedFields = aspireResponse.excludedFieldMaps().get(pojo.getClass());
                     if(null != excludedFields)
                         return !excludedFields.contains(writer.getName());
                 }

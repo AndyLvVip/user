@@ -78,10 +78,6 @@ public class Json2Utils {
 
 		objectMapper.registerModule(DOUBLE_SERIALIZER_MODULE);
 		objectMapper.registerModule(JAVA_TIME_MODULE);
-		objectMapper.setFilterProvider(AspireJsonFilterProvider.INSTANCE);
-		objectMapper.addMixIn(AspireResponse.class, AspireJsonFilterProvider.class);
-		objectMapper.addMixIn(IndexController.CorporateModel.class, AspireJsonFilterProvider.class);
-		objectMapper.addMixIn(UserModel.class, AspireJsonFilterProvider.class);
 		return objectMapper;
 	}
 

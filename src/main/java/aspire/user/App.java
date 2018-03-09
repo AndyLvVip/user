@@ -1,9 +1,11 @@
 package aspire.user;
 
 import aspire.common.config.JdbcConfig;
+import aspire.common.jackson.AspireJsonFilterProvider;
 import aspire.common.jooq.log.JooqLoggerListener;
 import aspire.common.utils.Json2Utils;
 import com.alibaba.druid.pool.DruidDataSource;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DataSourceConnectionProvider;
@@ -13,24 +15,24 @@ import org.jooq.impl.DefaultExecuteListenerProvider;
 import org.jooq.tools.StopWatchListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Arrays;
 
-@ComponentScan("aspire")
+@ComponentScan(value = "aspire")
 @SpringBootApplication
 @EnableEurekaClient
 public class App {
@@ -123,9 +125,17 @@ public class App {
     }
 
     @Bean
-    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE, proxyMode = ScopedProxyMode.TARGET_CLASS)
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = Json2Utils.newObjectMapper();
+        objectMapper.setFilterProvider(new AspireJsonFilterProvider());
+        return objectMapper;
+    }
+
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        mappingJackson2HttpMessageConverter.setObjectMapper(Json2Utils.newObjectMapper());
+        mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
         return mappingJackson2HttpMessageConverter;
     }
 
