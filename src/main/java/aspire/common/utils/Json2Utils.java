@@ -1,6 +1,10 @@
 package aspire.common.utils;
 
 import aspire.common.exception.AspireException;
+import aspire.common.interceptor.response.AspireResponse;
+import aspire.common.jackson.AspireJsonFilterProvider;
+import aspire.user.controller.IndexController;
+import aspire.user.model.UserModel;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonGenerator.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,19 +33,10 @@ import java.time.format.DateTimeFormatter;
  */
 public class Json2Utils {
 
-    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = defaultObjectMapper();
 
-    /**
-     * 是否打印美观格式
-     */
-    private final static boolean isPretty = true;
+    private static final SimpleModule DOUBLE_SERIALIZER_MODULE = doubleSerializerModule();
 
-
-    private static ObjectMapper defaultObjectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.configure(Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
+    private static SimpleModule doubleSerializerModule() {
 		SimpleModule module = new SimpleModule("CustomModule", Version.unknownVersion());
 		module.addSerializer(Double.class, new JsonSerializer<Double>(){
 			@Override
@@ -57,15 +52,40 @@ public class Json2Utils {
 			}
 
 		});
-		objectMapper.registerModule(module);
+		return module;
+	}
+
+	private static final JavaTimeModule JAVA_TIME_MODULE = javaTimeModule();
+
+    private static JavaTimeModule javaTimeModule() {
 		JavaTimeModule timeModule = new JavaTimeModule();
 		timeModule.addSerializer(LocalDateTime.class, UcaLocalDateTimeSerializer.INSTANCE);
 		timeModule.addDeserializer(LocalDateTime.class, UcaLocalDateTimeDeserializer.INSTANCE);
-		objectMapper.registerModule(timeModule);
+		return timeModule;
+	}
+
+    /**
+     * 是否打印美观格式
+     */
+    private final static boolean isPretty = true;
+
+    private static final ObjectMapper DEFAULT_OBJECT_MAPPER = newObjectMapper();
+
+    public static ObjectMapper newObjectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.configure(Feature.WRITE_BIGDECIMAL_AS_PLAIN, true);
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+		objectMapper.registerModule(DOUBLE_SERIALIZER_MODULE);
+		objectMapper.registerModule(JAVA_TIME_MODULE);
+		objectMapper.setFilterProvider(AspireJsonFilterProvider.INSTANCE);
+		objectMapper.addMixIn(AspireResponse.class, AspireJsonFilterProvider.class);
+		objectMapper.addMixIn(IndexController.CorporateModel.class, AspireJsonFilterProvider.class);
+		objectMapper.addMixIn(UserModel.class, AspireJsonFilterProvider.class);
 		return objectMapper;
 	}
 
-	public static ObjectMapper getObjectMapper() {
+	public static ObjectMapper defaultObjectMapper() {
 		return DEFAULT_OBJECT_MAPPER;
 	}
 
@@ -105,9 +125,9 @@ public class Json2Utils {
     	try{
     		String jsonString = "";
             if (isPretty) {
-                jsonString = getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
+                jsonString = defaultObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(object);
             } else {
-                jsonString = getObjectMapper().writeValueAsString(object);
+                jsonString = defaultObjectMapper().writeValueAsString(object);
             }
 
             return jsonString;
@@ -134,7 +154,7 @@ public class Json2Utils {
     	        	if(jsonString.endsWith("/r/n")) {
     					jsonString = jsonString.substring(0, jsonString.length() - "/r/n".length());
     				}
-    				return getObjectMapper().readValue(jsonString, c);
+    				return defaultObjectMapper().readValue(jsonString, c);
     	        }
     	}catch(Exception e){
     		throw new AspireException(e);

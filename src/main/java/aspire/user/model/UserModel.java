@@ -3,6 +3,7 @@ package aspire.user.model;
 import aspire.common.model.BaseModel;
 import aspire.user.repository.UserRepository;
 import aspire.user.repository.factory.Repositories;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import org.jooq.Table;
 import org.jooq.UpdatableRecord;
 
@@ -13,6 +14,7 @@ import static jooq.gen.Tables.USER;
  * @Date: created on 2018/2/6
  * @Description:
  */
+@JsonFilter("AspireResponse")
 public class UserModel extends BaseModel {
 
     private String username;
