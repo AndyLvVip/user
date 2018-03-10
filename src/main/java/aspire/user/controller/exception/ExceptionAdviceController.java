@@ -29,7 +29,7 @@ public class ExceptionAdviceController {
     @ResponseBody
     public AspireResponse globalException(Exception ex) {
         LOG.error(ex.getMessage(), ex);
-        return AspireResponse.ITERNAL_SERVER_ERROR;
+        return AspireResponse.INTERNAL_SERVER_ERROR;
     }
 
 }

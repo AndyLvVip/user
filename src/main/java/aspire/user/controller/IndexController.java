@@ -1,16 +1,15 @@
 package aspire.user.controller;
 
 import aspire.common.base.DbArrayList;
+import aspire.common.jackson.annotation.JsonResult;
 import aspire.user.model.UserModel;
 import com.fasterxml.jackson.annotation.JsonFilter;
-import jooq.gen.tables.User;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -69,6 +68,8 @@ public class IndexController {
     }
 
     @RequestMapping("userList")
+    @JsonResult(type = CorporateModel.class, included = {"price", "name", "users"})
+    @JsonResult(type = UserModel.class, excluded = {"id", "password"})
     public Object userList() {
         CorporateModel corporateA = new CorporateModel();
         corporateA.setAge(10);
@@ -78,6 +79,6 @@ public class IndexController {
         List<UserModel> users = new ArrayList<>();
         users.add(user);
         corporateA.setUsers(users);
-        return corporateA;
+        return DbArrayList.newInstance(Arrays.asList(corporateA), 1, 10, 1);
     }
 }

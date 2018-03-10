@@ -1,10 +1,15 @@
 package aspire.common.interceptor;
 
 import aspire.common.interceptor.response.AspireResponse;
+import aspire.common.jackson.annotation.JsonResult;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * @Author: andy.lv
@@ -14,12 +19,26 @@ import org.springframework.stereotype.Service;
 @Aspect
 @Service
 public class GlobalInterceptor {
+
     @Around("within(aspire.user.controller.*) && (" +
                 "@target(org.springframework.web.bind.annotation.RestController) || " +
-                "(@annotation(org.springframework.web.bind.annotation.RequestMapping) && @annotation(org.springframework.web.bind.annotation.ResponseBody))" +
+                "@annotation(org.springframework.web.bind.annotation.ResponseBody)" +
             ")")
     public Object wrapResponse(final ProceedingJoinPoint jp) throws Throwable {
+        MethodSignature ms = (MethodSignature) jp.getSignature();
+        JsonResult[] jsonResults = ms.getMethod().getDeclaredAnnotationsByType(JsonResult.class);
         Object realResult = jp.proceed(jp.getArgs());
-        return AspireResponse.ok(realResult);
+        AspireResponse resp;
+        if(realResult instanceof AspireResponse)
+            resp = (AspireResponse) realResult;
+        else
+            resp =  AspireResponse.ok(realResult);
+        for (int i = 0; i < jsonResults.length; i++) {
+            if(jsonResults[i].included().length > 0)
+                resp.putIncludedFields(jsonResults[i].type(), new HashSet<>(Arrays.asList(jsonResults[i].included())));
+            if(jsonResults[i].excluded().length > 0)
+                resp.putExcludedFileds(jsonResults[i].type(), new HashSet<>(Arrays.asList(jsonResults[i].excluded())));
+        }
+        return resp;
     }
 }

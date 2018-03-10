@@ -1,13 +1,11 @@
 package aspire.common.interceptor.response;
 
+import aspire.common.jackson.IJsonFilterFieldsHolder;
 import aspire.user.controller.IndexController;
 import aspire.user.model.UserModel;
 import com.fasterxml.jackson.annotation.JsonFilter;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @Author: andy.lv
@@ -15,16 +13,15 @@ import java.util.Set;
  * @Description:
  */
 @JsonFilter("AspireResponse")
-public class AspireResponse {
+public class AspireResponse implements IJsonFilterFieldsHolder {
 
     public static final AspireResponse
-            ACCESS_DENIED = new AspireResponse("403", "Access Denied"),
-            ITERNAL_SERVER_ERROR = new AspireResponse("500", "Internal Server Error")
+            ACCESS_DENIED = AspireResponse.newInstance("403", "Access Denied"),
+            INTERNAL_SERVER_ERROR = AspireResponse.newInstance("500", "Internal Server Error")
                     ;
 
     private String message;
     private String code;
-    private boolean handled = false;
 
     public Object getData() {
         return data;
@@ -35,13 +32,20 @@ public class AspireResponse {
     }
 
     private Object data;
-    private AspireResponse(String code, String msg) {
-        this.code = code;
-        this.message = msg;
+
+
+    public static AspireResponse newInstance(String code, String msg) {
+        AspireResponse resp = new AspireResponse();
+        resp.setCode(code);
+        resp.setMessage(msg);
+        resp.putIncludedFields(AspireResponse.class, new HashSet<>(Arrays.asList("code", "message", "data")));
+        return resp;
     }
 
+
+
     public static AspireResponse ok(Object data) {
-        AspireResponse resp = new AspireResponse("200", "Success");
+        AspireResponse resp = AspireResponse.newInstance("200", "Success");
         resp.setData(data);
         return resp;
     }
@@ -62,37 +66,22 @@ public class AspireResponse {
         this.code = code;
     }
 
-    public boolean handled() {
-        return handled;
+    private Map<Class<?>, Set<String>> includedFieldsMap = new HashMap<>();
+
+    public Map<Class<?>, Set<String>> includedFieldsMap() {
+        return includedFieldsMap;
     }
 
-    public void handled(boolean handled) {
-        this.handled = handled;
+    public void putIncludedFields(Class<?> type, Set<String> fields) {
+        includedFieldsMap.put(type, fields);
     }
 
+    private Map<Class<?>, Set<String>> excludedFieldsMap = new HashMap<>();
 
-    public Map<Class<?>, Set<String>> includedFieldMaps() {
-        Map<Class<?>, Set<String>> map = new HashMap<>();
-        Set<String> wrapper = new HashSet<>();
-        wrapper.add("code");
-        wrapper.add("data");
-
-        map.put(AspireResponse.class, wrapper);
-        Set<String> corporate = new HashSet<>();
-        corporate.add("name");
-        corporate.add("age");
-        corporate.add("users");
-        map.put(IndexController.CorporateModel.class, corporate);
-        return map;
+    public void putExcludedFileds(Class<?> type, Set<String> fields) {
+        excludedFieldsMap.put(type, fields);
     }
-
-    public Map<Class<?>, Set<String>> excludedFieldMaps() {
-        Set<String> user = new HashSet<>();
-        user.add("password");
-        user.add("id");
-
-        Map<Class<?>, Set<String>> map = new HashMap<>();
-        map.put(UserModel.class, user);
-        return map;
+    public Map<Class<?>, Set<String>> excludedFieldsMap() {
+        return excludedFieldsMap;
     }
 }

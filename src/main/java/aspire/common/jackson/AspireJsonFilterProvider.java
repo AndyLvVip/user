@@ -1,6 +1,5 @@
 package aspire.common.jackson;
 
-import aspire.common.interceptor.response.AspireResponse;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyFilter;
@@ -18,7 +17,7 @@ import java.util.Set;
  */
 public class AspireJsonFilterProvider extends FilterProvider {
 
-    private AspireResponse aspireResponse;
+    private IJsonFilterFieldsHolder filterFieldsHolder;
 
     @Override
     public BeanPropertyFilter findFilter(Object filterId) {
@@ -27,15 +26,13 @@ public class AspireJsonFilterProvider extends FilterProvider {
 
     @Override
     public PropertyFilter findPropertyFilter(Object filterId, Object valueToFilter) {
-        System.out.println("AspireJsonFilterProvider.findPropertyFilter: " + this);
         return new SimpleBeanPropertyFilter() {
 
 
             @Override
             public void serializeAsField(Object pojo, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
-                System.out.println("SimpleBeanPropertyFilter.serializeAsField: " + this);
-                if(pojo instanceof AspireResponse && null == aspireResponse) {
-                    aspireResponse = (AspireResponse) pojo;
+                if(null == filterFieldsHolder && pojo instanceof IJsonFilterFieldsHolder) {
+                    filterFieldsHolder = (IJsonFilterFieldsHolder) pojo;
                 }
 
                 if (include(pojo, writer)) {
@@ -46,15 +43,15 @@ public class AspireJsonFilterProvider extends FilterProvider {
             }
 
             private boolean include(Object pojo, PropertyWriter writer) {
-                if(aspireResponse == null)
+                if(filterFieldsHolder == null)
                     return true;
-                if(null != aspireResponse.includedFieldMaps()) {
-                    Set<String> includedFields = aspireResponse.includedFieldMaps().get(pojo.getClass());
+                if(null != filterFieldsHolder.includedFieldsMap()) {
+                    Set<String> includedFields = filterFieldsHolder.includedFieldsMap().get(pojo.getClass());
                     if(null != includedFields)
                         return includedFields.contains(writer.getName());
                 }
-                if(null != aspireResponse.excludedFieldMaps()) {
-                    Set<String> excludedFields = aspireResponse.excludedFieldMaps().get(pojo.getClass());
+                if(null != filterFieldsHolder.excludedFieldsMap()) {
+                    Set<String> excludedFields = filterFieldsHolder.excludedFieldsMap().get(pojo.getClass());
                     if(null != excludedFields)
                         return !excludedFields.contains(writer.getName());
                 }
